@@ -1,0 +1,62 @@
+# ─── Unity 生成物：绝不进 git（Library 有十几万文件） ───
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+/[Aa]ssets/AssetStoreTools*
+/[Aa]ssets/Plugins/Editor/JetBrains*
+/[Aa]ssets/StreamingAssets/aa.meta
+/[Aa]ssets/StreamingAssets/aa/*
+
+# ─── IDE ───
+.vs/
+.idea/
+.vscode/
+*.csproj
+*.unityproj
+*.sln
+*.slnx
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+!/Packages/manifest.json
+!/Packages/packages-lock.json
+
+# ─── 构建产物 ───
+*.apk
+*.aab
+*.unitypackage
+*.app
+ExportedObj/
+crashlytics-build.properties
+
+# ─── 操作系统 ───
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# ─── Unity 自动生成的资产缓存（可重建，体积大，不进仓库） ───
+/Assets/Unity.VisualScripting.Generated/VisualScripting.Flow/UnitOptions.db
+/Assets/Unity.VisualScripting.Generated/VisualScripting.Flow/UnitOptions.db.meta
+
+# ─── 本仓库：学习与工具目录的取舍 ───
+# 保留脚本与文档（.unity-mcp/*.md、*.ps1），排除可再生的参考转储与二进制备份
+/.unity-mcp/vendor/
+/.unity-mcp/burst-blocked-backup/
+# 学习截图留档（不想进仓库就取消下面这行的注释）
+# /LEARNING/shots/*
