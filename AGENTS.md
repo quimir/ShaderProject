@@ -33,8 +33,9 @@ pwsh -NoProfile -File LEARNING/sync.ps1 -Resume            # 打印当前状态�
 - 今天要学什么（当前任务原文 + 下一段入口 + 产物与判据）
 
 生成脚本：`LEARNING/daily-brief.ps1`（幂等，同日重复运行不覆盖；`-Force` 强制重建）。
-调度有两个来源，互为冗余：Windows 计划任务 `ShaderProject-DailyBrief`，以及 DSH 任务板卡片
-「每日 09:00 学习简报」。**只要 `.daily/TODAY.md` 存在且日期是今天，就用它，不必自己生成。**
+调度有两个来源，互为冗余：ZCode 自动化任务「每日 09:00 学习简报」（ZCode 工作区内配置，
+随 ZCode 存活），以及 DSH 任务板卡片「每日 09:00 学习简报」。**不用 Windows 计划任务**（用户
+明确不要，勿再注册）。**只要 `.daily/TODAY.md` 存在且日期是今天，就用它，不必自己生成。**
 
 ## 4. 教法规约（不可替换）
 
