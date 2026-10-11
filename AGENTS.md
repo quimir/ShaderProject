@@ -32,7 +32,12 @@ pwsh -NoProfile -File LEARNING/sync.ps1 -Resume            # 打印当前状态�
 - 昨天学了什么（来自 PROGRESS.md 的段尾注）
 - 今天要学什么（当前任务原文 + 下一段入口 + 产物与判据）
 - **这一课的知识坐标**（数学知识 + 图形学归属 + 要掌握的东西，来自 `LEARNING/task-knowledge.json`）
+- **课后补充**（仅当任务已完成：具体讲次/章节 + 小练习，来自 `LEARNING/task-supplements.json`）
 - 上次留下的待验证清单（来自 `LEARNING/notes/shader-math.md`）
+
+**引用讲次/章节时以 `LEARNING/resources-index.json` 为准**——那里的 GAMES101 讲次编号与讲题
+是从课程主页真实抓取的。**禁止编造视频时间戳**（bilibili 接口有反爬，无法核实），
+凭记忆写的错误时间戳会让整份学习材料失信。
 
 生成脚本：`LEARNING/daily-brief.ps1`（幂等，同日重复运行不覆盖；`-Force` 强制重建）。
 

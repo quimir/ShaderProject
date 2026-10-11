@@ -1,0 +1,95 @@
+{
+  "_说明": "资源索引：只收录经核实存在的课程讲次与书本出处。讲次编号与讲题取自 games-cn.org 课程主页（2026-10 抓取），不是凭记忆写的。",
+  "_不确定性声明": {
+    "视频时间戳": "刻意不写。bilibili 接口有反爬（412/-799），无法核实具体时间戳；凭记忆写出的时间戳会误导，宁缺毋滥。看讲次足够定位。",
+    "RTR4 章节号": "章号取自该译本公开的章节目录范围（第 1–26 章），小节号未逐条核实，引用时以关键词检索为准。",
+    "GAMES101 第 17/18 讲": "主页讲次列表中未单独列出（疑为答疑/补充讲），引用时跳过。"
+  },
+
+  "courses": {
+    "games101": {
+      "name": "GAMES101 现代计算机图形学入门（闫令琪）",
+      "homepage": "https://games-cn.org/intro-graphics/",
+      "note": "中文，免费，作业有自动评分。B 站有官方全集（在课程主页内查找入口）。",
+      "lectures": {
+        "6": "光栅化（离散化三角形）",
+        "7": "光栅化（深度测试与抗锯齿）",
+        "8": "着色（光照与基本着色模型）",
+        "9": "着色（着色频率、图形管线、纹理映射）",
+        "10": "几何（基本表示方法）",
+        "11": "几何（曲线与曲面）",
+        "12": "几何（前沿动态）",
+        "13": "光线追踪（基本原理）",
+        "14": "光线追踪（加速结构）",
+        "15": "路径追踪与光的传播理论",
+        "16": "复杂外观建模与光的传播、实时光线追踪（前沿动态）",
+        "19": "动画与模拟（基本概念、逆运动学、质点弹簧系统）"
+      }
+    },
+    "games202": {
+      "name": "GAMES202 高质量实时渲染（闫令琪）",
+      "homepage": "https://games-cn.org/games202/",
+      "note": "中文，免费。主题覆盖实时阴影、实时全局光照、降噪。具体讲次编号未在本机核实，按「主题」检索。",
+      "topics": ["实时阴影", "实时全局光照", "屏幕空间环境光遮蔽", "时域降噪", "预计算辐射传输"]
+    },
+    "games104": {
+      "name": "GAMES104 现代游戏引擎：从入门到实践（王希）",
+      "homepage": "https://games104.boomingtech.com/",
+      "note": "中文，免费。阶段 6 才用，讲渲染器在引擎里的位置。"
+    }
+  },
+
+  "books": {
+    "rtr4": {
+      "name": "Real-Time Rendering, 4th Edition",
+      "official": "https://www.realtimerendering.com/",
+      "corrigenda": "https://www.realtimerendering.com/corrigenda.html",
+      "cn_online": "https://www.wolai.com/fkGSwxLu2pjWD7kiBY1V7W",
+      "cn_pdf": "https://github.com/Morakito/Real-Time-Rendering-4th-CN/releases/tag/v1.0",
+      "cn_repo": "https://github.com/Morakito/Real-Time-Rendering-4th-CN",
+      "cn_bilibili": "https://www.bilibili.com/video/BV1UM411Z7g1",
+      "print_cn": "《实时渲染（第 4 版）》清华大学出版社 · ISBN 9787302661276",
+      "chapters": {
+        "5": "着色基础（Shading Basics）",
+        "6": "纹理（Texture，含法线贴图与凹凸映射）",
+        "7": "阴影（Shadows）",
+        "9": "基于物理的着色（Physically Based Shading）",
+        "11": "全局光照（Global Illumination）",
+        "20": "高效着色（Efficient Shading）"
+      },
+      "chapters_note": "只列本路线实际会引用的章。第 17–19、21–26 章的章名未在本机逐条核实，因此不写——引用时请直接查在线目录 https://www.wolai.com/fkGSwxLu2pjWD7kiBY1V7W"
+
+    },
+    "pbrt": {
+      "name": "Physically Based Rendering: From Theory to Implementation, 4th",
+      "online_free": "https://pbr-book.org/",
+      "note": "官网在线免费。采样与蒙特卡洛的权威，阶段 5 用。"
+    },
+    "rtow": {
+      "name": "Ray Tracing in One Weekend 系列（三册）",
+      "online_free": "https://raytracing.github.io/",
+      "note": "官网在线免费，阶段 5 入门首选。"
+    },
+    "rt_gems": {
+      "name": "Ray Tracing Gems I / II",
+      "online_free": "https://www.realtimerendering.com/raytracinggems/",
+      "note": "免费 PDF，降噪与采样实践。"
+    },
+    "gpu_gems": {
+      "name": "GPU Gems 1–3",
+      "online_free": "https://developer.nvidia.com/gpugems/gpugems3/contributors",
+      "note": "NVIDIA 免费在线，章节式技巧集。"
+    },
+    "learnopengl": {
+      "name": "LearnOpenGL",
+      "cn": "https://learnopengl-cn.github.io/",
+      "en": "https://learnopengl.com/",
+      "note": "中文版免费。点乘→亮度、阴影贴图、PBR 各一节，和本路线阶段高度对应。"
+    },
+    "unity_shader_book": {
+      "name": "《Unity Shader 入门精要》冯乐乐",
+      "publisher": "https://www.ptpress.com.cn/shopping/buy?bookId=f0f004f8-1386-44bb-8c22-92c44894de4a",
+      "note": "中文，Unity 向。线上看第 1–8 章，第 9 章之后偏技巧。"
+    }
+  }
+}

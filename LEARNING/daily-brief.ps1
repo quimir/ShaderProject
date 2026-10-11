@@ -186,11 +186,43 @@ if ((Test-Path $knowledgePath) -and $task) {
     }
 }
 
+# ── 课后补充：任务完成后的深入材料 + 小练习 ──
+# 只在「已完成」时出现——正在进行时抛这些会变成同课压力，也会违背「主线优先」。
+# 「深入」条目里的讲次编号来自 LEARNING/resources-index.json（真实抓取），不是凭记忆写的。
+$supplPath = Join-Path $ProjectPath 'LEARNING\task-supplements.json'
+if ((Test-Path $supplPath) -and $task -and $status -eq '已完成') {
+    try {
+        $sp = (Get-Content $supplPath -Raw -Encoding UTF8 | ConvertFrom-Json).supplements
+        $sup = $sp.$task
+        if ($sup) {
+            [void]$sb.AppendLine('## 4a. 课后补充（上一课）')
+            [void]$sb.AppendLine()
+            if ($sup.deepen) {
+                [void]$sb.AppendLine('**去哪里深入**')
+                [void]$sb.AppendLine()
+                foreach ($d in $sup.deepen) { [void]$sb.AppendLine("- $d") }
+                [void]$sb.AppendLine()
+            }
+            if ($sup.practice) {
+                [void]$sb.AppendLine('**小练习（可选，别当欠债）**')
+                [void]$sb.AppendLine()
+                foreach ($p in $sup.practice) { [void]$sb.AppendLine("- [ ] $p") }
+                [void]$sb.AppendLine()
+            }
+            [void]$sb.AppendLine('> 资源链接总表：[`LEARNING/resources-index.json`](../LEARNING/resources-index.json)')
+            [void]$sb.AppendLine('> （课程讲次取自课程主页真实抓取；视频时间戳刻意不写——无法核实宁缺毋滥。）')
+            [void]$sb.AppendLine()
+        }
+    } catch {
+        [void]$sb.AppendLine("> （task-supplements.json 解析失败：$($_.Exception.Message)）")
+        [void]$sb.AppendLine()
+    }
+}
+
 if ($todayNotes.Count -gt 0) {
     [void]$sb.AppendLine('## 4. 今天已完成的段落')
     [void]$sb.AppendLine()
     [void]$sb.AppendLine((Format-Notes $todayNotes))
-    [void]$sb.AppendLine()
 }
 [void]$sb.AppendLine('## 阶段分布')
 [void]$sb.AppendLine()
