@@ -58,5 +58,7 @@ $RECYCLE.BIN/
 # 保留脚本与文档（.unity-mcp/*.md、*.ps1），排除可再生的参考转储与二进制备份
 /.unity-mcp/vendor/
 /.unity-mcp/burst-blocked-backup/
+# Unity-MCP 运行日志：每次运行都变，没有版本价值
+/Assets/UnityMCP/Log/
 # 学习截图留档（不想进仓库就取消下面这行的注释）
 # /LEARNING/shots/*

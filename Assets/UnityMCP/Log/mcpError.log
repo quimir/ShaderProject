@@ -1,1 +1,0 @@
-{"ts":"2026-10-11T03:44:38.120Z","tool":"execute_menu_item","type":"tool","status":"ERROR","ms":1,"params":{},"error":"Required parameter 'menu_path' or 'menuPath' is missing or empty."}

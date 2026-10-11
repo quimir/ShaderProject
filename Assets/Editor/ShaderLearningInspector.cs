@@ -161,7 +161,18 @@ public sealed class ShaderLearningInspector : EditorWindow
 
     private void OnGUI()
     {
+        // 工具栏必须先画：那个 ObjectField 是用户拖入 Shader 的入口，
+        // 提前返回会把它一起吃掉，人就卡死了。
         DrawToolbar();
+
+        // 选中对象被删除后，Unity 的 == 重载会把 _shader 判为 null；
+        // 此时任何触及它的调用都会抛异常，并打断布局的 Begin/End 配对。
+        if (_shader == null)
+        {
+            EditorGUILayout.Space(4);
+            EditorGUILayout.HelpBox("把一个 Shader 资产拖到上面的槽位，或先在 Project 窗口里选中它。", MessageType.Info);
+            return;
+        }
 
         EditorGUILayout.BeginHorizontal();
         DrawLeftPane();
@@ -342,8 +353,14 @@ public sealed class ShaderLearningInspector : EditorWindow
         if (_compiled.HasValue && _compiled.Value.Messages != null)
             messages.AddRange(_compiled.Value.Messages);
 
-        var shaderMsgs = ShaderUtil.GetShaderMessages(_shader);
-        if (shaderMsgs != null) messages.AddRange(shaderMsgs);
+        // _shader 为 null 时必须跳过：ShaderUtil.GetShaderMessages(null) 内部会拆掉
+        // 参数并抛 ArgumentNullException。窗口刚创建、或选中对象被删除时都会走到这里，
+        // 而这个异常会打断 OnGUI 的布局配对，连带刷出 GUILayout 报错。
+        if (_shader != null)
+        {
+            var shaderMsgs = ShaderUtil.GetShaderMessages(_shader);
+            if (shaderMsgs != null) messages.AddRange(shaderMsgs);
+        }
 
         var distinct = messages
             .GroupBy(m => $"{m.severity}|{m.message}|{m.line}|{m.file}")
