@@ -60,6 +60,34 @@
 第 3 步是核心。**不要说「不对」然后给答案**，要说清「你在哪一步引入了错误假设」。
 他会用「思路错在哪」来校准自己的直觉，这比记住结论值钱。
 
+### 数学：每个新函数必须先讲，再动手（YG 明确要求）
+
+**他的编程能力强、数学较弱。** shader 里几乎每一行都是数学，所以每次出现**新函数或新数学概念**时，
+在他动手之前必须先做一遍「数学铺垫」，不允许丢一个 `dot(N, L)` 就让他填。
+
+固定四段式：
+
+```text
+1. 它在算什么          → 一句话给出直观含义，不先上公式
+2. 对应什么数学         → 点乘 / 叉乘 / 归一化 / 插值 / 钳制 … 以及它的几何意义
+3. 这个场景里为什么用它  → 换掉它会怎样，为什么不能是别的运算
+4. 链接                → 概念链接（优先中文）+ Unity 官方文档页
+```
+
+**链接选择原则**：优先中文 + 可免费访问。候选池：
+
+| 概念 | 首选链接 |
+|---|---|
+| 向量、点乘、叉乘 | [3Blue1Brown《线性代数的本质》](https://www.bilibili.com/video/BV1ys411472E)（第 1–3 集） |
+| 点乘的几何意义 | [LearnOpenGL 中文 · 基础光照](https://learnopengl-cn.github.io/)（看「基础光照」一节） |
+| 矩阵与变换 | [3Blue1Brown 第 3–4 集](https://www.bilibili.com/video/BV1ys411472E)；[3D 数学基础（免费在线）](https://gamemath.com/) 第 4–6 章 |
+| 钳制 / 饱和 | [Unity 文档 ShaderLab 内建函数](https://docs.unity3d.com/6000.5/Documentation/Manual/SL-BuiltinFunctions.html) |
+| HLSL 函数总览 | [Microsoft Learn · HLSL 内建函数](https://learn.microsoft.com/zh-cn/windows/win32/direct3dhlsl/dx-graphics-hlsl-intrinsic-functions) |
+| URP 概念 | [URP 官方手册（中文）](https://docs.unity3d.com/cn/current/Manual/urp/urp-introduction.html) |
+
+**注意**：讲数学时**不要替他算**。给定义、给几何意义、给链接，然后让他猜、让他验证——
+和上面「理论先问思路」是同一套原则，只是提前到了「介绍函数」这一步。
+
 ### 代码：核心行给他写，胶水你来写
 
 | 谁写 | 内容 |

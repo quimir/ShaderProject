@@ -174,6 +174,25 @@ foreach ($k in ($perStage.Keys | Sort-Object)) {
     [void]$sb.AppendLine("| $k | $($v.done) | $($v.total) |")
 }
 [void]$sb.AppendLine()
+
+# ── 附上数学待验证清单（来自 notes/shader-math.md 的「待验证」小节）──
+# 下次坐下时最需要的是「上段没验证完的东西」，公式全文留在笔记里按需查。
+$mathNote = Join-Path $ProjectPath 'LEARNING\notes\shader-math.md'
+if (Test-Path $mathNote) {
+    $mathRaw = Get-Content $mathNote -Raw -Encoding UTF8
+    $m = [regex]::Match($mathRaw, '(?ms)^## 待验证.*?(?=^## |\z)')
+    if ($m.Success) {
+        [void]$sb.AppendLine('## 上次留下的待验证清单')
+        [void]$sb.AppendLine()
+        # 去掉标题行本身，只留正文
+        $body2 = ($m.Value -split "`r?`n" | Select-Object -Skip 1) -join "`r`n"
+        [void]$sb.AppendLine($body2.Trim())
+        [void]$sb.AppendLine()
+        [void]$sb.AppendLine('> 公式与几何意义见 [`LEARNING/notes/shader-math.md`](../LEARNING/notes/shader-math.md)。')
+        [void]$sb.AppendLine()
+    }
+}
+
 [void]$sb.AppendLine('---')
 [void]$sb.AppendLine()
 [void]$sb.AppendLine('**下一步动作**：按「今天要学什么」的入口开始，30–40 分钟一段；')
