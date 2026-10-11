@@ -76,38 +76,46 @@ pwsh -NoProfile -File LEARNING/sync.ps1 -Task "stage0: T0.1 向量可视化"
 
 ---
 
-## 6. 首次配置远程仓库（只做一次）
+## 6. 远程仓库（已配置完成）
 
-本仓库已 `git init` 并完成首次提交（分支 `main`，459→458 个文件，约 21.8MB）。
-还差连上 GitHub：
+本仓库已接上远程并完成首次推送：
 
-1. 在 GitHub 网页上新建一个**空仓库**（不要勾选 README / .gitignore / license，全留空）。
-2. 在本机执行（把 URL 换成你的）：
-
-```powershell
-cd F:\Projects\ShaderProject
-git remote add origin https://github.com/<你的用户名>/<仓库名>.git
-git branch -M main
-git push -u origin main
+```
+origin  https://github.com/quimir/ShaderProject.git   （分支 main）
+作者    QuiMir <2546670299@qq.com>（全局与仓库级都已设置）
 ```
 
-3. 另一台电脑：
+### 另一台电脑首次接入
 
 ```powershell
-git clone https://github.com/<你的用户名>/<仓库名>.git
-# 然后用 Unity Hub 添加这个目录打开项目
+git clone https://github.com/quimir/ShaderProject.git
+cd ShaderProject
+git config user.name "QuiMir"
+git config user.email "2546670299@qq.com"
+# 然后用 Unity Hub 添加该目录并打开项目（Library 会自动重建，需几分钟）
 ```
-
-**注意**：`Library/`、`Temp/`、`Logs/`、`obj/`、`.vs/` 已被 `.gitignore` 排除，
-它们是可重建的生成物，不要为了让别的机器「能直接打开」而把它们提交上去——
-另一台机器首次打开 Unity 会自己重建（视项目大小需几分钟）。
-真正需要同步的只有文本资产：`Assets/`、`Packages/`、`ProjectSettings/`、
-`LEARNING/`、`.unity-mcp/*.md|*.ps1`。
 
 ### 认证
 
-首次 `push` 会要凭据。推荐装 GitHub CLI 后 `gh auth login`，
-或在 GitHub 生成 Personal Access Token 当密码用（用 Windows 凭据管理器保存即可）。
+- **本机**：Windows 凭据管理器里已有 GitHub 凭据（账号 `quimir`），push/pull 免交互，无需任何配置。
+- **另一台机器**：跑一次一次性的凭据配置脚本即可：
+
+```powershell
+pwsh -NoProfile -File LEARNING/setup-github-auth.ps1 -UserName quimir
+```
+
+它会提示你粘贴一个 Personal Access Token（GitHub → Settings → Developer settings →
+Personal access tokens → Tokens (classic) → 勾选 `repo`），存进 Windows 凭据管理器，
+token 不落明文文件、不经过聊天记录。之后该机的 pull/push 全程免交互。
+
+> 也可选择装 GitHub CLI 后 `gh auth login`，效果等价。
+
+### 不要提交的东西
+
+`Library/`、`Temp/`、`Logs/`、`obj/`、`.vs/` 已在 `.gitignore` 里排除——它们是可重建的生成物。
+**不要为了「让别的机器直接能打开」而把它们提交上去**，仓库体积会从 22MB 膨胀到几 GB。
+真正需要同步的只有文本资产：`Assets/`、`Packages/`、`ProjectSettings/`、`LEARNING/`、
+`.unity-mcp/*.md|*.ps1`。
 
 ---
 
