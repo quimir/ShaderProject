@@ -10,10 +10,10 @@
         3. git add -A → commit → push（未配远程则跳过推送）
         4. 顺手跑一次 MCP 通道自检（失败不阻断）
 
-    参数分两类，请勿混用：
-        -Task   本次**做完**的任务（写进尾注）
-        -NextTask 下次要做的任务（写进状态块）
-        两种场景示例见 .EXAMPLE。
+    参数分三类，注意区分：
+        -Task      本次**做完**的任务（只写进尾注）
+        -Message   git 提交信息（同时用于状态块的「最后一段」）
+        -NextTask / -NextState / -NextEntry   下次的状态，**显式给出，脚本不推断**
 
 .PARAMETER Message
     git 提交信息，必填。
@@ -25,21 +25,29 @@
     # 换机或恢复
     pwsh -NoProfile -File LEARNING/sync.ps1 -Resume
 
-    # 一段结束：做完了 T0.1，下次做 T0.2
+    # 一段结束：T0.1 全部做完，下次开 T0.2
     pwsh -NoProfile -File LEARNING/sync.ps1 `
-        -Message "stage0: T0.1 向量可视化" `
-        -Task T0.1 -State 已完成 -NextTask T0.2 `
-        -Minutes 30 `
+        -Message "stage0: T0.1 向量可视化完成" `
+        -Task T0.1 -Minutes 30 `
+        -NextTask T0.2 -NextState 未开始 `
         -NextEntry "给 Math_Visualize 接入世界法线，输出 dot(N,L) 灰度" `
         -Note "搞懂了 dot 越接近 1 越亮；下次直接改 frag 里的 return"
+
+    # 一段没做完：任务状态写「进行中」，下次接着干
+    pwsh -NoProfile -File LEARNING/sync.ps1 `
+        -Message "stage0: T0.2 起头" `
+        -Task T0.2 -Minutes 25 `
+        -NextTask T0.2 -NextState 进行中 `
+        -NextEntry "接上：世界法线已取到，还差和主光方向点乘" `
+        -Note "卡在 UNITY_MATRIX_M 用错，取了对象空间法线"
 #>
 [CmdletBinding()]
 param(
     [string]$Message,
     [string]$Task,
-    [ValidateSet('未开始', '进行中', '已完成')]
-    [string]$State,
     [string]$NextTask,
+    [ValidateSet('未开始', '进行中', '已完成')]
+    [string]$NextState,
     [string]$NextEntry,
     [int]$Minutes,
     [string]$Note,
@@ -103,13 +111,9 @@ function Set-StateField {
 # ── 1. 更新状态块 ──
 # 本段已结束 → 释放主机占用
 $raw = Set-StateField $raw '激活主机' '""'
-# 下次要做的事
+# 下次要做的事：状态由 -NextState 显式给出，不靠推断
 if ($NextTask) { $raw = Set-StateField $raw '当前任务' $NextTask }
-if ($State) {
-    # 本次做完了 → 下次是全新开始；本次没做完 → 下次继续
-    $nextState = if ($State -eq '已完成') { '未开始' } else { '进行中' }
-    $raw = Set-StateField $raw '任务状态' $nextState
-}
+if ($NextState) { $raw = Set-StateField $raw '任务状态' $NextState }
 $raw = Set-StateField $raw '最后更新' (Get-Today)
 
 if ($NextEntry) {
@@ -117,6 +121,11 @@ if ($NextEntry) {
 } elseif ($raw -match '(?m)^\s*下一段入口:\s*""\s*$') {
     $raw = Set-StateField $raw '下一段入口' '见 PROGRESS 底部尾注'
 }
+
+# 「最后一段」用本次的提交信息概括，保留人类可读的一行
+$lastSummary = if ($Task) { "$Task $Message" } else { $Message }
+if ($lastSummary.Length -gt 80) { $lastSummary = $lastSummary.Substring(0, 77) + '...' }
+$raw = Set-StateField $raw '最后一段' ($lastSummary -replace '[\r\n]+', ' ')
 
 # ── 2. 追加尾注 ──
 $duration = if ($Minutes -gt 0) { "$Minutes 分钟" } else { '—' }
