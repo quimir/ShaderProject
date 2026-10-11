@@ -2,8 +2,9 @@ Shader "ShaderLearning/FlatColor"
 {
     Properties
     {
-        // T0.1 故意不给任何可调属性：这一段的重点是「片元输出的是一个数值」，
-        // 先不引入材质面板这个变量。属性留到 T0.2 再上。
+        // T0.2 先不引入属性：颜色仍然算出来直接输出，
+        // 这样「画面变化」的原因只有一个——光照方向在变。
+        // 环境光那一项是刻意加的常量偏置，没有它背光侧会全黑，看不出结构。
     }
 
     SubShader
@@ -24,44 +25,58 @@ Shader "ShaderLearning/FlatColor"
             #pragma fragment frag
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/RealtimeLights.hlsl"
 
             struct Attributes
             {
                 float4 positionOS : POSITION;
-                float2 uv         : TEXCOORD0;
+                float3 normalOS   : NORMAL;
             };
 
             struct Varyings
             {
                 float4 positionHCS : SV_POSITION;
-                float2 uv          : TEXCOORD0;
+                float3 normalWS    : TEXCOORD0;
+                float3 lightDirWS  : TEXCOORD1;
             };
 
             Varyings vert(Attributes IN)
             {
                 Varyings OUT;
                 OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
-                OUT.uv = IN.uv;
+
+                // 法线必须转到世界空间：光源方向是世界空间的量，
+                // 两个向量只有在同一个坐标系里做点乘才有意义。
+                OUT.normalWS = TransformObjectToWorldNormal(IN.normalOS);
+
+                // URP 的主光方向是全局量。这里在顶点阶段取一次即可，
+                // 因为它对一个 Pass 内所有像素都相同（平行光）。
+                OUT.lightDirWS = _MainLightPosition.xyz;
+
                 return OUT;
             }
 
             half4 frag(Varyings IN) : SV_Target
             {
+                half3 N = normalize(IN.normalWS);
+                half3 L = normalize(IN.lightDirWS);
+
                 // ═══════════════════════════════════════════════════════════
-                // TODO(YG): 返回一个常量颜色。
+                // TODO(YG): 用点乘算出一个标量，再把它当灰度输出。
                 //
-                // 要求：
-                //   1. 先用 half3(0.6, 0.8, 0.0) —— 观察它是什么颜色
-                //   2. 然后把三个分量分别改成 0.0 和 1.0，各截一张图，回答：
-                //      · 第三个分量恒为 0，为什么画面里完全没有蓝色？
-                //      · 把第一个分量改大，画面往哪个方向变？
-                //   3. 不要用 IN.uv —— 这一段的重点是「颜色是数值」，
-                //      UV 讲的是「片元在表面的位置」，两个概念现在混在一起会互相干扰。
+                // 步骤：
+                //   1. 先写 half ndotl = dot(N, L);  —— 判断它是什么、取值范围是多少
+                //   2. 先把 ndotl 原样写到三个通道，看背光侧会出现什么
+                //   3. 再用 saturate(ndotl) 包一层，对比两张图的差别
                 //
-                // 提示：返回值是 half4(r, g, b, a)，a 通道先固定写 1.0。
+                // 提示：saturate(x) 帮你把值限制在 0 到 1 之间。
+                //       第 2 步故意不做限制，就是为了让你亲眼看到「没限制会怎样」。
                 // ═══════════════════════════════════════════════════════════
 
-                half3 color = half3(0, 0, 0);   // ← 把这一行换成你要的颜色
+                half ndotl = dot(N, L);          // ← 先原样用，看看会出什么
+                // half ndotl = saturate(dot(N, L));   // ← 第 3 步把上面一行换成这一行
+
+                half3 color = half3(ndotl, ndotl, ndotl);   // 灰度：三个通道同一个值
 
                 return half4(color, 1.0);
             }
