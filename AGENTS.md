@@ -94,6 +94,37 @@ pwsh -NoProfile -File .unity-mcp/burst-cache-fix.ps1        # 诊断
 pwsh -NoProfile -File .unity-mcp/burst-cache-fix.ps1 -Fix   # 备份并清除被拦缓存
 ```
 
+## 6b. Shader 学习工具链
+
+| 工具 | 位置 | 用途 |
+|---|---|---|
+| **Shader 学习检视器** | `Assets/Editor/ShaderLearningInspector.cs`，菜单 `Window ▸ Shader Learning ▸ Shader Inspector` | 看预处理后代码、编译器生成的 HLSL、逐 Pass stage 与关键字、单变体编译与消息 |
+| **URP 官方参考副本** | `LEARNING/reference/urp-shaders/*.txt` | 11 个最值得学的 URP HLSL（BRDF / Lighting / Shadows / GI …），加 `.txt` 后缀所以不参与编译，但可搜索、可读、AI 能直接查 |
+| **参考索引** | `LEARNING/reference/README.md` | 哪个文件对应哪个学习阶段、该搜什么关键词 |
+| **刷新脚本** | `LEARNING/reference/refresh-urp-reference.ps1` | Unity 升级 URP 后重跑，更新参考副本 |
+
+Unity 内置的 **Rendering Debugger**（`Window ▸ Analysis ▸ Rendering Debugger`）与
+**Frame Debugger** 无需安装任何东西，却能直接可视化 NdotL、法线、基础色、金属度、粗糙度
+这些中间量——讲光照原理时优先用它们做演示。
+
+### 改 `ShaderLearningInspector.cs` 前必读
+
+它用的是 **Unity 6 才公开的 API**，训练数据里的写法大多是错的。改之前先用 `unity_reflect`
+核对。已踩过的坑：
+
+- `ShaderType` / `ShaderCompilerPlatform` 在 `UnityEditor.Rendering`，**不在** `UnityEngine.Rendering`
+- `ShaderCompilerPlatform` 的成员是 **`D3D`**，不是 `D3D11`
+- `ShaderData` 及其嵌套类型（`Pass` / `PreprocessedVariant` / `VariantCompileInfo`）在 `UnityEditor` 下
+- `PreprocessVariant` / `CompileVariant` 需要第 5 个参数 `stripLineDirectives`（bool）
+- `PassIdentifier` 只有公开构造函数 `(uint, uint)`，属性只读，**不能用对象初始化器**
+- `ShaderUtil.GetPassKeywords` 有效重载带 `ref`，而编辑器语言版本是 C# 9（`ref` 传 `in` 报 CS9194）——
+  故代码里用反射兼容层 `GetPassKeywordsCompat`
+
+### 现阶段明确不装的第三方插件
+
+可视化 Shader 编辑器（Amplify Shader Editor 等）、Shader 参考导航器（URPShaderViewer 等）暂不引入，
+理由与时机见 `LEARNING/reference/README.md` 末尾。**Shader Graph 17.5.0 已随 URP 装好**，无需额外安装。
+
 ## 7. 仓库纪律
 
 - **绝不提交** `Library/`、`Temp/`、`Logs/`、`obj/`、`.vs/`（已在 `.gitignore` 排除，别改）。

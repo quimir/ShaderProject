@@ -10,7 +10,7 @@
 任务状态: 未开始
 激活主机: ""
 最后更新: 2026-10-11
-最后一段: feat(learning): 跨壳每日简报 + 自动推送钩子 + AGENTS.md
+最后一段: 工具链 fix(shader-tools): 修复检视器 API + 建立 URP 参考库
 下一段入口: 从 T0.1 开始：写 Math_Visualize.shader，用固定向量 float3(0.6,0.8,0) 输出颜色
 ```
 
@@ -182,6 +182,8 @@
 格式：`日期 | 时长 | 任务 | 学到什么 / 卡在哪 / 下次从哪接`
 
 <!-- 从下面这一行开始追加 -->
+
+- 2026-10-11 | — | 工具链 | ShaderLearningInspector 6 个编译错误全修（Unity 6 API 变更）；新增 LEARNING/reference 参考库（11 个 URP 官方 HLSL）；AGENTS.md 增补工具链与 API 踩坑清单。
 
 - 2026-10-11 | — | — | 已完成：09:00 定时简报（Windows 计划任务 + DSH 任务板双通道）、git 自动 push 钩子、跨壳入口 AGENTS.md。下一步可开始 T0.1。
 
