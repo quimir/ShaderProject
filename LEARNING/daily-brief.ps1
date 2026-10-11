@@ -159,6 +159,33 @@ if ($currentBlock) {
     [void]$sb.AppendLine('（状态块里的当前任务在清单中定位失败，请检查 PROGRESS.md）')
 }
 [void]$sb.AppendLine()
+
+# ── 知识卡：这一课要用的数学 + 在图形学里的位置 ──
+# 数据来自 LEARNING/task-knowledge.json，任何壳读简报都能拿到，不依赖谁记得。
+$knowledgePath = Join-Path $ProjectPath 'LEARNING\task-knowledge.json'
+if ((Test-Path $knowledgePath) -and $task) {
+    try {
+        $kb = (Get-Content $knowledgePath -Raw -Encoding UTF8 | ConvertFrom-Json).tasks
+        $card = $kb.$task
+        if ($card) {
+            [void]$sb.AppendLine('## 3b. 这一课的知识坐标')
+            [void]$sb.AppendLine()
+            [void]$sb.AppendLine("**数学**：$($card.math)")
+            [void]$sb.AppendLine()
+            [void]$sb.AppendLine("**图形学归属**：$($card.graphics)")
+            [void]$sb.AppendLine()
+            [void]$sb.AppendLine("**这一课要掌握**：$($card.learn)")
+            [void]$sb.AppendLine()
+            [void]$sb.AppendLine('> 动手之前先讲清上面这些数学概念（几何意义优先于公式），')
+            [void]$sb.AppendLine('> 讲完让他自己猜、自己验证，公式全表见 [`notes/shader-math.md`](../LEARNING/notes/shader-math.md)。')
+            [void]$sb.AppendLine()
+        }
+    } catch {
+        [void]$sb.AppendLine("> （task-knowledge.json 解析失败：$($_.Exception.Message)）")
+        [void]$sb.AppendLine()
+    }
+}
+
 if ($todayNotes.Count -gt 0) {
     [void]$sb.AppendLine('## 4. 今天已完成的段落')
     [void]$sb.AppendLine()

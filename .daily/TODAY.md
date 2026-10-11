@@ -18,7 +18,7 @@
 
 ## 3. 今天要学什么
 
-**入口**：T0.2 已就绪：先看 dot(N,L) 原样输出（背光侧会出问题），再换成 saturate 对比
+**入口**：T0.2 收尾：先猜 dot(N,L) 哪块是 +1/-1，再切 saturate 对比背光侧
 
 ```markdown
 **T0.2** `[30min]` 点乘可视化 —— 渐变第一次出现
@@ -30,8 +30,20 @@
       (3) 法线为什么要转到世界空间才能和光方向做点乘。
 ```
 
+## 3b. 这一课的知识坐标
+
+**数学**：点乘的代数定义与几何定义、余弦定理、向量归一化（长度与方向的分离）、点乘的符号与夹角关系
+
+**图形学归属**：着色模型与漫反射（GAMES101「着色/Shading」）· 光源与表面朝向几何
+
+**这一课要掌握**：dot(N,L) 就是 cosθ；为什么归一化是点乘的前提；背光侧为负数的成因
+
+> 动手之前先讲清上面这些数学概念（几何意义优先于公式），
+> 讲完让他自己猜、自己验证，公式全表见 [`notes/shader-math.md`](../LEARNING/notes/shader-math.md)。
+
 ## 4. 今天已完成的段落
 
+  - 2026-10-11 | 45 分钟 | T0.2 | 本轮做数学铺垫：normalize/dot/saturate/TransformObjectToWorldNormal/_MainLightPosition 五个概念。dot 的几何定义 dot=|a||b|cosθ，归一化后退化为 cosθ；saturate 就是 T0.1 撞到的钳制。公式已固化到 LEARNING/notes/shader-math.md，并写进 AI-HANDOFF 教法规约（以后每个新函数先讲数学再动手）。T0.2 的四处待验证留在笔记里，简报已自动附带。
   - 2026-10-11 | 30 分钟 | T0.1 | T0.1 结论：颜色是三独立通道非混合；alpha 无 Blend 声明时被忽略；越界值被钳制（3.0→纯红、-1.0→全黑）而非归一化——区间内的 0.6/0.8 未变即为判据；UV 是位置不是颜色。截图 6 张已归档 LEARNING/shots/。
   - 2026-10-11 | — | 工具链 | 控制台清零：修掉 ShaderUtil.GetShaderMessages(null) 空引用（它会打断 OnGUI 布局并连带刷 GUILayout 报错）。删除两个无用备份，MCP 日志停追踪（保留磁盘文件）。两套 URP 路径实测通过。
   - 2026-10-11 | — | 工具链 | ShaderLearningInspector 6 个编译错误全修（Unity 6 API 变更）；新增 LEARNING/reference 参考库（11 个 URP 官方 HLSL）；AGENTS.md 增补工具链与 API 踩坑清单。
