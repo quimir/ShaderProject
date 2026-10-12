@@ -62,3 +62,6 @@ $RECYCLE.BIN/
 /Assets/UnityMCP/Log/
 # 学习截图留档（不想进仓库就取消下面这行的注释）
 # /LEARNING/shots/*
+# MCP 相机工具抓图的临时目录：每次抓图都新增文件，没有版本价值
+/Assets/Screenshots/
+/Assets/Screenshots.meta
