@@ -95,13 +95,15 @@ pwsh -NoProfile -File LEARNING/sync.ps1 `
 
 ## 6. 可用工具
 
-### Unity MCP（DSH 与 ZCode 都已配置同一个端点）
+### Unity MCP（本工作区固定 8082，别走 8081）
 
 ```
-http://127.0.0.1:8081/mcp        # Streamable HTTP，需 Accept: application/json, text/event-stream
+http://127.0.0.1:8082/mcp        # Streamable HTTP，需 Accept: application/json, text/event-stream
 ```
 
-DSH 里工具名形如 `mcp__unity__manage_shader`；ZCode 里是 MCP 工具 `unity-mcp`。
+DSH 里本工程的工具名形如 `mcp__unityRenderMCP__manage_shader`，对应 **8082 = ShaderProject**。
+⚠️ `mcp__unityMCP__*` 是 **8081**，指向另一个工程 client-E2 —— 在本仓库调用它等于操作错工程。
+ZCode 里是 MCP 工具 `unity-mcp`（端点由该端自己的 profile 决定）。
 没有 MCP 时可用项目内脚本桥：
 
 ```powershell
@@ -147,6 +149,9 @@ Unity 内置的 **Rendering Debugger**（`Window ▸ Analysis ▸ Rendering Debu
 - `PassIdentifier` 只有公开构造函数 `(uint, uint)`，属性只读，**不能用对象初始化器**
 - `ShaderUtil.GetPassKeywords` 有效重载带 `ref`，而编辑器语言版本是 C# 9（`ref` 传 `in` 报 CS9194）——
   故代码里用反射兼容层 `GetPassKeywordsCompat`
+- **`ShaderData.VariantCompileInfo` 没有 `ResourceBindings` 成员**（6000.0 与 6000.5 文档 + 本地反射三处一致，
+  属早期凭猜测补的假 API，CS1061 就是这么来的）。它只有 `Success` / `Messages` / `ShaderData` /
+  `Attributes` / `TextureBindings` / `ConstantBuffers` 六个 —— 别再补回来
 
 ### 现阶段明确不装的第三方插件
 

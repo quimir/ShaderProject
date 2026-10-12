@@ -4,7 +4,7 @@
 
 .DESCRIPTION
     Talks Streamable HTTP MCP directly to the FastMCP endpoint the Unity plugin
-    launches (default http://127.0.0.1:8081/mcp), so Unity can be driven from a
+    launches (this project runs on http://127.0.0.1:8082/mcp), so Unity can be driven from a
     shell without depending on any editor integration being loaded.
 
     The Unity Editor plugin writes the endpoint and its instance token into
@@ -45,7 +45,7 @@ function Get-Endpoint {
             return "http://127.0.0.1:$($Matches[1])/mcp"
         }
     }
-    return 'http://127.0.0.1:8081/mcp'
+    return 'http://127.0.0.1:8082/mcp'
 }
 
 $script:endpoint = Get-Endpoint

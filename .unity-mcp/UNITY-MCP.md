@@ -1,47 +1,68 @@
 # Unity-MCP 常驻链接（本仓库）
 
 本文件记录 **ShaderProject** 与 Unity Editor 之间的 MCP 通道，保证换会话、重启 DSH 之后依然能连上
-`http://127.0.0.1:8081`。
+`http://127.0.0.1:8082`。**8082 是本工程唯一端口**；8081 属于另一个工程 client-E2，见 §1.1。
 
-## 1. 端点事实（已实测）
+## 1. 端点事实（2026-10-12 实测）
 
 | 项 | 值 |
 |---|---|
-| Base URL | `http://127.0.0.1:8081` |
-| MCP 端点 | `http://127.0.0.1:8081/mcp`（FastMCP Streamable HTTP；`/` 会返回 404） |
+| Base URL | `http://127.0.0.1:8082` |
+| MCP 端点 | `http://127.0.0.1:8082/mcp`（FastMCP Streamable HTTP；`/` 会返回 404） |
 | 健康检查 | `GET /health` → `{"status":"healthy","version":"10.2.0","message":"MCP for Unity server is running"}` |
-| 服务器 | `mcp-for-unity-server` 3.4.8（Python FastMCP） |
-| Unity 实例 | `ShaderProject@a3fa6c3754f3ab93`，Unity `6000.5.4f1`，`Assets/Scenes/SampleScene.unity` |
+| 服务器 | 包版本 `10.2.0`；`initialize` 的 serverInfo 报告 `mcp-for-unity-server` 3.4.7（Python FastMCP） |
+| Unity 实例 | `ShaderProject@fcb4641ce9ab8fc5`，Unity `6000.0.60f1`，`projectRoot = D:/Project/ShaderProject` |
 | 工具数 | 48 + 动态 custom tools |
 | 鉴权 | 无（只绑定 127.0.0.1，本地直连） |
-| 进程 | `mcp-for-unity.exe --transport http --http-url http://127.0.0.1:8081 --pidfile Library/MCPForUnity/RunState/mcp_http_8081.pid` |
+| 进程 | `uvx --offline --from "mcpforunityserver==10.2.0" mcp-for-unity --transport http --http-url http://127.0.0.1:8082 --project-scoped-tools --pidfile D:\Project\ShaderProject\Library\MCPForUnity\RunState\mcp_http_8082.pid` |
 
 服务器进程由 Unity 插件（`com.coplaydev.unity-mcp`，见 `Packages/manifest.json`）自动拉起，
-PID 写在 `Library/MCPForUnity/RunState/mcp_http_8081.pid`，日志在
-`Library/MCPForUnity/Logs/server-launch-8081.log`。
+PID 写在 `Library/MCPForUnity/RunState/mcp_http_8082.pid`，日志在
+`Library/MCPForUnity/Logs/server-launch-8082.log`。
+
+### 1.1 8081 和 8082 是两个工程，别串线
+
+```text
+8082  mcpforunityserver 10.2.0  →  本工程      ShaderProject                    ← 只用这个
+8081  mcpforunityserver 9.7.3   →  另一个工程  client-E2 (D:\Project\project-e2\client-E2)
+```
+
+每个 Unity 工程用自己的 `--http-url / --pidfile / --unity-instance-token` 拉起各自的**独立服务进程**，
+两侧实例注册表互不可见：连 8082 天生只能碰到 ShaderProject。所以在 DSH 里：
+
+- 本仓库用 `mcp__unityRenderMCP__*`（→ 8082）；
+- `mcp__unityMCP__*`（→ 8081）会操作到 client-E2，**在本仓库不要用**。
+
+⚠️ 隐患：Unity 侧 `MCPForUnity.HttpUrl` 是**全局单值** EditorPrefs
+（`HKCU\Software\Unity Technologies\Unity Editor 5.x`），当前值是 `http://127.0.0.1:8082`。
+哪个工程的 Bridge 最后重启，它就被写成哪个端口。所以重启本工程的 MCP Bridge 之前，先确认
+`Window ▸ MCP for Unity` 里的 URL 是 8082；被 client-E2 写过之后，本工程会抢不到自己的端口。
+
+另注：两个服务端版本不同（9.7.3 vs 10.2.0），工具集可能有差异，以各自的
+`mcpforunity://instances` 与工具表为准，别假设两边行为一致。
 
 ## 2. 通道 A：DSH 原生工具（模型直接调用）
 
 配置在 DSH 桌面 profile：
 
-`C:\Users\25466\.dsh\profiles\desktop\cordis.patch.yml`
+`C:\Users\Administrator\.dsh\profiles\desktop\cordis.patch.yml`
 
 ```yaml
 - insert:
-    - id: mcp-unity
+    - id: unity-render-mcp
       name: "@deepseek-ai/dsh-mcp-client"
       config:
-        serverName: unity
+        serverName: unityRenderMCP
         transport: streamable-http
-        url: http://127.0.0.1:8081/mcp
-        toolCallTimeoutMs: 600000
+        url: http://127.0.0.1:8082/mcp
         failOnStartupError: false
+        toolCallTimeoutMs: 600000
         reconnect:
           enabled: true
-          initialDelayMs: 500
-          maxDelayMs: 30000
           maxAttempts: 1000000
 ```
+
+同一个文件里还有一条 `unity-mcp` → `http://127.0.0.1:8081/mcp`，那是 client-E2 工作区在用，**别删**。
 
 要点：
 
@@ -49,10 +70,21 @@ PID 写在 `Library/MCPForUnity/RunState/mcp_http_8081.pid`，日志在
   会被 loader 警告并跳过（方言见 `cordis-composition-reference`）。
 - `url` 是**完整端点**：客户端内部走 `new StreamableHTTPClientTransport(new URL(config.url))`，
   基址后面要自己带 `/mcp`。
-- 行 id `mcp-unity` 用作 patch 目标键；`serverName: unity` 决定工具名前缀。
+- 行 id `unity-render-mcp` 用作 patch 目标键；`serverName: unityRenderMCP` 决定工具名前缀。
 - `toolCallTimeoutMs` 提到 600000：跑测试/构建/烘焙会超过默认 60s。
 - `maxAttempts` 不可写 0（`z.number().min(1)`），写大值≈长期不断线。
-- 改完要重启 DSH 才生效；重启后模型侧多出 `mcp__unity__<tool>` 一类工具。
+- 改 profile patch 会被运行中的宿主热加载，无需重启；生效后模型侧有 `mcp__unityRenderMCP__<tool>`。
+
+### 2.1 `Session not found` 是什么意思
+
+服务进程一重启，旧会话就作废。客户端若还拿着旧 `mcp-session-id`，每个请求都会拿到
+`{"code":-32600,"message":"Session not found"}`。注意它是 **HTTP 200 里的 JSON-RPC 错误帧，不是断线**，
+所以 `reconnect` 策略救不了它（那只处理传输层失败）。处置顺序：
+
+1. 改一下 `cordis.patch.yml`（哪怕只改注释）触发宿主热加载 → 客户端重新 `initialize` 拿新会话；
+2. 仍不行就重启 DSH 宿主；
+3. 服务端侧的会话创建记录可在 `Library/MCPForUnity/Logs/server-launch-8082.log`
+   里按 `Created new transport with session ID` 核对。
 
 ## 3. 通道 B：项目内脚本桥（不依赖任何客户端加载）
 
@@ -69,7 +101,8 @@ pwsh -NoProfile -File .unity-mcp/unity-mcp.ps1 call manage_shader -action read -
 pwsh -NoProfile -File .unity-mcp/unity-mcp.ps1 assets -FilterType Shader -PageSize 20   # 别名 → manage_asset
 ```
 
-脚本会自动从 `Library/MCPForUnity/RunState/mcp_http_*.pid` 推断端口，端口变了也不用改。
+脚本会自动从 `Library/MCPForUnity/RunState/mcp_http_*.pid` 推断端口，端口变了也不用改；
+推断不出来时才回退到默认值 `http://127.0.0.1:8082/mcp`。
 需要换端点时显式传 `-Url http://127.0.0.1:PORT/mcp`。
 
 ## 4. 协议坑（踩过的，别再踩）
@@ -92,25 +125,25 @@ pwsh -NoProfile -File .unity-mcp/unity-mcp.ps1 assets -FilterType Shader -PageSi
 
 ```powershell
 # 1) 端口活着，并确认是 MCP-for-Unity
-Invoke-RestMethod http://127.0.0.1:8081/health
+Invoke-RestMethod http://127.0.0.1:8082/health
 
-# 2) 两条通道都能打通
+# 2) 通道 B 能打通
 pwsh -NoProfile -File .unity-mcp/unity-mcp.ps1 probe
 
-# 3) 模型侧：调用 mcp__unity__manage_scene（action=get_active）或读 mcpforunity://instances
+# 3) 模型侧：调用 mcp__unityRenderMCP__manage_scene（action=get_active）或读 mcpforunity://instances
 ```
 
-`probe` 应输出：`server : mcp-for-unity-server 3.4.8`、`tools : 48`、以及
-`instance_count: 1` 与实例名 `ShaderProject@a3fa6c3754f3ab93`。
+`probe` 应输出：`endpoint : http://127.0.0.1:8082/mcp`、`server : mcp-for-unity-server 3.4.7`、
+`tools : 48`，以及 `instance_count: 1` 与实例名 `ShaderProject@fcb4641ce9ab8fc5`。
 
 ## 6. 回滚
 
 ```powershell
-Copy-Item "C:\Users\25466\.dsh\profiles\desktop\cordis.patch.yml.bak-unitymcp" `
-          "C:\Users\25466\.dsh\profiles\desktop\cordis.patch.yml" -Force
+Copy-Item "C:\Users\Administrator\.dsh\profiles\desktop\cordis.patch.yml.bak-20261012-pre8082doc" `
+          "C:\Users\Administrator\.dsh\profiles\desktop\cordis.patch.yml" -Force
 ```
 
-备份是写入前原样复制的版本（不含 MCP 条目）。只删 `- insert:` 那一段同样可以，其余 patch 行未改动。
+备份是写入前原样复制的版本（含旧的拓扑注释）。只删 `- insert:` 那一段同样可以，其余 patch 行未改动。
 
 ## 7. `vendor/` 里是什么
 

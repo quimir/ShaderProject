@@ -268,7 +268,6 @@ public sealed class ShaderLearningInspector : EditorWindow
             EditorGUILayout.LabelField($"消息数：{c.Messages?.Length ?? 0}");
             EditorGUILayout.LabelField($"常量缓冲：{c.ConstantBuffers?.Length ?? 0}");
             EditorGUILayout.LabelField($"纹理绑定：{c.TextureBindings?.Length ?? 0}");
-            EditorGUILayout.LabelField($"资源绑定：{c.ResourceBindings?.Length ?? 0}");
         }
 
         EditorGUILayout.EndScrollView();
