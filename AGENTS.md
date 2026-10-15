@@ -137,6 +137,7 @@ pwsh -NoProfile -File .unity-mcp/burst-cache-fix.ps1 -Fix   # 备份并清除被
 | 工具 | 位置 | 用途 |
 |---|---|---|
 | **Shader 学习检视器** | `Assets/Editor/ShaderLearningInspector.cs`，菜单 `Window ▸ Shader Learning ▸ Shader Inspector` | 看预处理后代码、编译器生成的 HLSL、逐 Pass stage 与关键字、单变体编译与消息 |
+| **切线空间可视化** | `Assets/Editor/VertexFrameGizmos.cs`，菜单 `Tools ▸ Shader Learning ▸ Vertex Frames ▸ …` | 选中带 MeshFilter 的物体，在 Scene 视图把**每个顶点**的 T/B/N 画成红/绿/蓝三根箭头。**三条轴可分别开关**（`总开关` + `显示 T/B/N`，后三者快捷键 Ctrl+Alt+1/2/3），想「只看一根轴」就关掉另外两个；`VertexStride` 采样、`ArrowLength` 调长度。讲「切线空间 / 法线贴图为什么相对表面」时先用它。**必须用 `SceneView.duringSceneGui` + `Handles` 实现**：`[DrawGizmo]`/`OnDrawGizmos` 那套渲染通道**不进 MCP 的 Scene 视图截图**（截到的只有 GUI 通道，Transform 工具能看到），改完没法验证 |
 | **URP 官方参考副本** | `LEARNING/reference/urp-shaders/*.txt` | 11 个最值得学的 URP HLSL（BRDF / Lighting / Shadows / GI …），加 `.txt` 后缀所以不参与编译，但可搜索、可读、AI 能直接查 |
 | **参考索引** | `LEARNING/reference/README.md` | 哪个文件对应哪个学习阶段、该搜什么关键词 |
 | **刷新脚本** | `LEARNING/reference/refresh-urp-reference.ps1` | Unity 升级 URP 后重跑，更新参考副本 |

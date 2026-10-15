@@ -94,7 +94,11 @@ Shader "ShaderLearning/FlatColor"
 
                 half3 up = half3(0, 1, 0);
 
-                half3 color = half3(ndotl, ndotl, ndotl);   // ← 占位：T0.2 的灰度。你写完上面三行就换掉它
+                half3 T=normalize(cross(N,up));
+
+                half3 B=normalize(cross(N,T));
+
+                half3 color = half3(T.r,B.g,N.b)*0.5+0.5;
 
                 return half4(color, 1.0);
             }
